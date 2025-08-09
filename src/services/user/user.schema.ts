@@ -1,30 +1,20 @@
 import { model, Schema, Document } from "mongoose";
 
 interface IUser extends Document {
-  email: string;
   name: string;
+  email: string;
   password: string;
-//   image?: string;
-//   uid?: string;
-//   nid?: string;
-//   nidFront?: string;
-//   nidBack?: string;
-//   role: "user" | "admin";
-//   verified: boolean;
+  role: "user" | "supervisor" | "admin";
+  verified: boolean,
 }
 
 const userSchema = new Schema<IUser>(
   {
-    email: { type: String, required: true, unique: true },
     name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    // image: String,
-    // uid: String,
-    // nid: { type: String, unique: true, sparse: true },
-    // nidFront: String,
-    // nidBack: String,
-    // role: { type: String, enum: ["user", "admin"], default: "user" },
-    // verified: { type: Boolean, default: false },
+    role: { type: String, enum:['user', 'supervisor', 'admin']},
+    verified: { type: Boolean, default: false},
   },
   { timestamps: true }
 );

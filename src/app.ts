@@ -8,6 +8,7 @@ import http, { Server } from 'http';
 import services from './services';
 import { ConfigureContext } from './utils/types/configure-context';
 
+
 interface Dep {
   method: (...args: any[]) => Promise<any>;
   args: any[];
@@ -15,7 +16,7 @@ interface Dep {
 
 interface Config {
   port: number;
-  origins: string[];
+  origin: string;
   mongodb_uri: string;
 }
 
@@ -44,7 +45,7 @@ class App {
   private init() {
     // Add basic middleware here if you want
     this.express.use(express.json());
-    this.express.use(cors({ origin: settings.origins, credentials: true }));
+    this.express.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
     this.express.use(morgan('common'));
     this.express.use(cookieParser());
     this.express.use(form.parse());
