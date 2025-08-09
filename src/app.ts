@@ -7,7 +7,8 @@ import form from 'express-form-data';
 import http, { Server } from 'http';
 import services from './services';
 import { ConfigureContext } from './utils/types/configure-context';
-
+import createMailService from './controller/mailer';
+import  crypto  from './utils/crypto';
 
 interface Dep {
   method: (...args: any[]) => Promise<any>;
@@ -18,6 +19,7 @@ interface Config {
   port: number;
   origin: string;
   mongodb_uri: string;
+  
 }
 
 
@@ -25,14 +27,16 @@ interface Config {
 class App {
   private express: Express;
   private router: Router;
-   private server!: Server;
+  private server!: Server;
   private config: Config;
   private depPromises?: Promise<any>[];
+  private mailer: ReturnType<typeof createMailService>;
 
   constructor({ deps }: { deps?: Dep[] } = {}) {
     this.express = express();
     this.router=  express.Router();
     this.config = settings;
+    this.mailer = createMailService();
    
 
     if (deps) {
@@ -81,6 +85,9 @@ configure(callback: (this: ConfigureContext) => void): void {
 
   context.route = this.router;
   context.settings = this.config;
+  context.mailer = this.mailer;
+  context.crypto  = crypto ;
+
 
   callback.call(context);
 }

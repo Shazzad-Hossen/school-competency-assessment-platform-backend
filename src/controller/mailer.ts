@@ -1,13 +1,5 @@
 import nodemailer, { Transporter } from "nodemailer";
-
-interface MailSettings {
-  SMTP_HOST: string;
-  SMTP_PORT: number;
-  SMTP_USER: string;
-  SMTP_PASSWORD: string;
-  EMAIL_NAME: string;
-  EMAIL_FROM: string;
-}
+import settings from "../settings";  // Import your Settings type here
 
 interface SendMailOptions {
   receiver: string;
@@ -16,13 +8,13 @@ interface SendMailOptions {
   type?: "html" | "text";
 }
 
-export default function createMailService(settings: MailSettings) {
+export default function createMailService() {
   const transporter: Transporter = nodemailer.createTransport({
-    host: settings.SMTP_HOST,
-    port: settings.SMTP_PORT,
+    host: settings.smtp_host,
+    port: settings.smtp_port || 587,
     auth: {
-      user: settings.SMTP_USER,
-      pass: settings.SMTP_PASSWORD,
+      user: settings.smtp_user || "",
+      pass: settings.smtp_password || "",
     },
   });
 
@@ -36,7 +28,7 @@ export default function createMailService(settings: MailSettings) {
   }: SendMailOptions) {
     try {
       const msgObj: nodemailer.SendMailOptions = {
-        from: `${settings.EMAIL_NAME} <${settings.EMAIL_FROM}>`,
+        from: `${settings.email_name} <${settings.email_from}>`,
         to: receiver,
         subject,
       };

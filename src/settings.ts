@@ -16,6 +16,8 @@ interface Settings {
   smtp_port: number | undefined;
   smtp_user: string | undefined;
   smtp_password: string | undefined;
+  email_name: string | undefined;
+  email_from: string | undefined;
 }
 
 const settings: Settings = {
@@ -30,6 +32,8 @@ const settings: Settings = {
   smtp_port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
   smtp_user: process.env.SMTP_USER,
   smtp_password: process.env.SMTP_PASSWORD,
+  email_name: process.env.EMAIL_NAME,
+  email_from: process.env.EMAIL_FROM,
 };
 
 

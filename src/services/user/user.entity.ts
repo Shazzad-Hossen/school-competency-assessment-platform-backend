@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 
 const createAllowed = new Set(['name', 'email', 'password']);
 
-export const createUser = () => async (req: Request, res: Response) => {
+export const createUser = ({ mailer, crypto }: ConfigureContext) => async (req: Request, res: Response) => {
   try {
     const isValid = Object.keys(req.body).every(key=>createAllowed.has(key));
     if(!isValid) return res.status(400).send('Invalid body properties');
@@ -15,7 +15,18 @@ export const createUser = () => async (req: Request, res: Response) => {
     if(exist) return res.status(409).send('User already exist with this email');
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = await User.create({...req.body, password: hashedPassword});
-    res.send({message:'success', data: user });
+    const otp = (Math.floor(1000 + Math.random() * 9000)).toString();
+    const token = crypto.encrypt({ email: user.email, otp, expiration: Date.now() + 5 * 60_000 });
+
+
+    const mailRes= await mailer({
+      receiver:user.email,
+      subject:'Email Verification',
+      body: otp,
+      type: "text",
+    });
+    console.log(mailRes);
+    res.send({message:'success', data: token });
   } catch {
     res.status(500).send('Internal server error');
   }
@@ -34,10 +45,9 @@ export const signIn = ({ settings }: ConfigureContext) => async (req: Request, r
     const payload = { _id: user._id }
     const accessToken = jwt.sign(payload, settings.secret, { expiresIn: settings.access_token_expiry  });
     const refreshToken = jwt.sign(payload, settings.secret, { expiresIn: settings.refresh_token_expiry  });
-
-
-const isProd = process.env.NODE_ENV === 'production';
-res
+    
+    
+    res
   .cookie('accessToken', accessToken, {
     httpOnly: true,
     secure: true,
