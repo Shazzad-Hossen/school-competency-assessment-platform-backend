@@ -34,7 +34,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
       res.cookie('accessToken', newAccessToken, { httpOnly: true, secure: true, sameSite: "none" });
     }
   
-    req.user = await User.findById(userId);
+    req.user = await User.findById(userId).populate('assesment');
     if(!req.user)  return res.status(401).send("Unauthorized");
     next();
     
